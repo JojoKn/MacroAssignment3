@@ -418,6 +418,7 @@ prior<-bv_priors()
 #Estimate the Bayesian VAR
 x<-BVAR::bvar(yest, lags=lag)
 print(x)
+str(x)
 
 #calculate the impulse response functions
 setting<-bv_irf(horizon=24, identification = FALSE)
