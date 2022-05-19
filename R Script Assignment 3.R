@@ -92,12 +92,19 @@ adf.test(gdpdefgr2, alternative=c("stationary"))
 #with almost constant variance around mean (almost) zero. The adf.test command can 
 #reject the explosiveness of the process.
 
+
 ###4###
+
+# Write down a VAR(p) process in its general form.
+# y_t = c + \sum_{j=1}^{p}A_{ij}y_{t-j} + \epsilon,~~~ \epsilon \sim N(0,\Sigma)
+
+# Transform the VAR(p) process to a SVAR(p) process with the according transformation.
+# B_0y_t = B_0c + \sum_{j=1}^{p}B_0A_{ij}y_{t-j} + B_0e_t,~~~ e_t \sim N(0,I)~
 
 #Problem with the error terms in "normal" VARs: they are mutually correlated
 #This does not allow for a clear economic interpretation. What we want to identify are structural shocks:
-  #Orthogonal shocks (i.e. they are not mutually correlated)
-  #with economic meaning
+#Orthogonal shocks (i.e. they are not mutually correlated)
+#with economic meaning
 #To identify these shocks, we need the structural representation of the VAR:
 
 #For this to be working, we need to find the matrix B0, which multiplies the whole VAR to obtain the
@@ -112,6 +119,10 @@ adf.test(gdpdefgr2, alternative=c("stationary"))
 #down B0, which is what we call identification. Recursive refers to the structure of B0 being a lower
 #triangular matrix. The restrictions that are imposed by B0 not only have to include the minimum amount 
 #of restrictions for the model to be identified, but also need to have economically meaningful.
+
+# The recursive identification process is sensitive to the ordering of variables. In the Cholesky decomposition, the restrictions imply that the first variable is not contemporaneously correlated with any other variables, the second variable is only contemporaneously correlated with the first variable, and so on.
+# In the context of Monetary Policy identification, a typical implementation is ordering the variables as output, inflation, then interest rate. This implies that output is only dependent its own structural shocks contemporaneously, inflation depends on itself and output contemporaneously and interest rate is endogenously dependent on output, inflation and interest contemporaneously. This ordering has to be defended using economic intuition and cannot be verified empirically in the model.
+
 
 ###5###
 
@@ -187,8 +198,14 @@ plot(impulseFFR)
 #The same holds true for the output gap (i.e. GDP growth), as this also increases in the
 #short run before decreasing in the long run.
 
+# Increase in interest rate is persistently high for 24 periods and returns to zero over time. There is an initial increase in the interest rate after the shock, peaking after 2 periods.
+# Initial increase in GDP growth rate for approximately 5 periods, subsequently becoming negative, then tenting back towards zero over time.
+# Similar to the GDP growth rate, the GDP deflector initially increases, peaking at period 3, then reduces to below zero. This stays persistently below zero for all 24 periods, tending back towards zero over time.
 
 ###Is this in accordance with what we would expect from theory?
+
+# The responses are somewhat consistent with economic theory. Consider the basic New Keynesian model. With an contractionary monetary policy shock, interest rates stay persistently high rates over time, tending towards zero. This is consistent with our SVAR model.
+# For GDP growth and the inflation responses, the basic New Keynesian model does not exhibit the initial hump-shaped increase that we observe in the IRFs, but the persistent negative GDP growth and inflation rates, tending back towards zero over time, is consistent with the theoretical model.
 
 #No, for the output gap and the inflation it is not what we would expect, at least not in 
 #the short run, as the impulse responses behave opposite to what we would expect.
@@ -426,7 +443,7 @@ irf(x)<-BVAR::irf(x, setting, conf_bands=c(0.05, 0.1), n_thin=1L)
 plot(BVAR::irf(x))
 
 ###Which prior did you use?
-#Minnesota prior, but nothing adjusted, everything governed/optimised by the algorithm
+#Minnesota prior, but nothing adjusted, everything governed/optimised by the algorithm. Using this prior regularises the data. This helps to remove the underestimation of persistence common in frequentist approaches.
 
 ###What are the differences compared to the frequentist VAR?
 #In estimation, we use the concept of belief updating; the prior is updated using the
@@ -434,7 +451,12 @@ plot(BVAR::irf(x))
 #Contentwise, the puzzle that was part of the frequentist VAR also appears in the 
 #Impulse Response functions; even though there is a monetary policy shock which
 #raises the interest rate, Inflation and Outputgap first increase before decreasing.
+# Frequentist VAR has a small sample bias, where the persistence of parameter estimates is systematically underestimated. Frequentist VAR also faces the curse of dimensionality - the proliferation of parameters when new variables are added.
+# Bayesian VAR approaches address these limitations through regularization and the choice of relevant priors, thus limiting the variance of parameter estimates.
+# The interpretation of uncertainty bands is also different in both approaches - see below.
 
 ###How do you interpret the uncertainty bands?
 #The uncertainty bands result from the estimation uncertainty introduced using the 
 #Bayesian VAR. Between the bands, the credible set of impulse responses can be found.
+# In Bayesian statistics, parameters are not considered to be fixed, but random variables. So, the uncertainty bands can be interpreted as the distribution of the parameter of interest. This reflects the fundamental epistemological uncertainty in the world.
+# In frequentist statistics, we think of the parameter as a fixed and unknown value, and the uncertainty band is a set of values within which the 'true' value should lie with a given certainty.
