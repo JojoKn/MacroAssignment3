@@ -99,9 +99,9 @@ adf.test(gdpdefgr2, alternative=c("stationary"))
 # y_t = c + \sum_{j=1}^{p}A_{ij}y_{t-j} + \epsilon,~~~ \epsilon \sim N(0,\Sigma)
 
 # Transform the VAR(p) process to a SVAR(p) process with the according transformation.
-# B_0y_t = B_0c + \sum_{j=1}^{p}B_0A_{ij}y_{t-j} + B_0e_t,~~~ e_t \sim N(0,I)~
+# B_0y_t = B_0c + \sum_{j=1}^{p}B_0A_{ij}y_{t-j} + e_t,~~~ e_t \sim N(0,I)~
 
-#Problem with the error terms in "normal" VARs: they are mutually correlated
+#Problem with the error terms in "normal" VARs: they are mutually correlated.
 #This does not allow for a clear economic interpretation. What we want to identify are structural shocks:
 #Orthogonal shocks (i.e. they are not mutually correlated)
 #with economic meaning
@@ -121,7 +121,7 @@ adf.test(gdpdefgr2, alternative=c("stationary"))
 #of restrictions for the model to be identified, but also need to have economically meaningful.
 
 # The recursive identification process is sensitive to the ordering of variables. In the Cholesky decomposition, the restrictions imply that the first variable is not contemporaneously correlated with any other variables, the second variable is only contemporaneously correlated with the first variable, and so on.
-# In the context of Monetary Policy identification, a typical implementation is ordering the variables as output, inflation, then interest rate. This implies that output is only dependent its own structural shocks contemporaneously, inflation depends on itself and output contemporaneously and interest rate is endogenously dependent on output, inflation and interest contemporaneously. This ordering has to be defended using economic intuition and cannot be verified empirically in the model.
+# In the context of Monetary Policy identification, a typical implementation is ordering the variables as output, inflation, then interest rate. This implies that output is only dependent its own structural shocks contemporaneously, inflation depends on itself and output contemporaneously and interest rate is endogenously dependent on output, inflation and interest shocks contemporaneously. This ordering has to be defended using economic intuition and cannot be verified empirically in the model.
 
 
 ###5###
@@ -142,15 +142,15 @@ rownames(yest)<-as.character(t_)
 
 #How do you decide on the number of lags?
 #This can be done by using the Information criteria. In R, a function is implemented that returns the
-#calculated selection criteria. Select minimum BIC from there (results in smallest number of lags)
+#calculated selection criteria. Select minimum BIC from there (results in smallest number of lags).
 
 lagselection<-VARselect(yest)
 lag<-lagselection$selection[3]
 
 #Estimation procedure of the VAR(2)
 
-var<-VAR(yest, p=lag, type=c("const")) 
-summary(var)   
+var<-VAR(yest, p=lag, type=c("const"))
+summary(var)
 
 #Storing the coefficients of the VAR(2)
 A <- as.matrix(Bcoef(var))
@@ -158,7 +158,7 @@ A <- as.matrix(Bcoef(var))
 #Notational Issues: Looking for the A representation of the SVAR; therefore 
 #define a 3x3 identity matrix for the A matrix with NA elements at the spots that 
 #one wants to have estimates for; set bmat=NULL in the estimation
-#Compared to the notation from task 4, A corresponds to matrix B0. 
+#Compared to the notation from task 4, A corresponds to matrix B0.
 
 amat<-diag(3)
 amat[1,1]=amat[2,2]=amat[3,3]=NA
