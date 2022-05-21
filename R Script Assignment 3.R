@@ -54,6 +54,8 @@ plot.ts(xrawtseries, main="Macro Time Series")
 
 ###2###
 
+par(mfrow=c(2,1))
+
 #Real GDP
 rgdpgr<-diff(log(xrawtseries[,1]), lag=4)*100
 plot.ts(rgdpgr)
@@ -63,6 +65,8 @@ abline(h=0, col="green")
 gdpdefgr<-diff(log(xrawtseries[,2]), lag=4)*100
 plot.ts(gdpdefgr)
 abline(h=0, col="green")
+
+dev.off()
 
 ###3###
 
@@ -82,6 +86,7 @@ adf.test(gdpdefgr, alternative=c("stationary"))
 
 #Therefore, take second differences for this time series:
 gdpdefgr2<-diff(log(xrawtseries[,2]), lag=4, differences=2)*100
+
 plot.ts(gdpdefgr2)
 abline(h=0, col="green")
 summary(gdpdefgr2)
