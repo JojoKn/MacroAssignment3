@@ -104,11 +104,11 @@ $$
 B_0y_t = B_0c + \sum_{j=1}^{p}B_0A_{ij}y_{t-j} + e_t,~~~ e_t \sim N(0,I)~
 $$
 
-The problem with the error terms in "normal" VARs: they are mutually correlated. This does not allow for a clear economic interpretation. What we want to identify are structural shocks: orthogonal shocks that are not mutually correlated and have economic meaning. To identify these shocks, we need the structural representation of the VAR.
+We use VAR to understand the dynamic relation between variables in a system over time. The problem with interpreting values of "normal" VARs is that the error terms are mutually correlated. This does not allow for a clear economic interpretation. What we want to identify are structural shocks: orthogonal shocks that are not mutually correlated and have economic meaning. To identify these shocks, we need the structural representation of the VAR.
 
 For this to work, we need to find the matrix $B_0$, which multiplies the whole VAR to obtain the structural representation. However, this leads to the problem that the model contains more parameters than we can estimate from the model, implying that we need to pose (Mx(M-1))/2 restrictions. The matrix $B_0$ can be obtained using the Cholesky decomposition, which results in a lower triangular matrix that will therefore contain (Mx(M-1))/2 zeros above the main diagonal, which implies that there are sufficient restrictions to estimate the model.
 
-Recursive Identification therefore means that the VAR will first be transformed using B0 to make the error terms uncorrelated with each other before estimating the model. For this to work, we need to pin down $B_0$, which is what we call identification. Recursive refers to the structure of B0 being a lower triangular matrix. The restrictions that are imposed by $B_0$ not only have to include the minimum amount of restrictions for the model to be identified, but also need to have economically meaningful.
+Recursive Identification therefore means that the VAR will first be transformed using B0 to make the error terms uncorrelated with each other before estimating the model. For this to work, we need to pin down $B_0$, which is what we call identification. Recursive refers to the structure of $B_0$ being a lower triangular matrix. The restrictions that are imposed by $B_0$ not only have to include the minimum amount of restrictions for the model to be identified, but also need to have economically meaningful.
 
 The recursive identification process is sensitive to the ordering of variables. In the Cholesky decomposition, the restrictions imply that the first variable is not contemporaneously correlated with any other variables, the second variable is only contemporaneously correlated with the first variable, and so on.
 
@@ -129,7 +129,7 @@ rownames(yest)<-as.character(t_)
 ```
 
 #### How do you decide on the number of lags?
-This can be done by using the Information criteria. In R, a function is implemented that returns the calculated selection criteria. Select minimum BIC from there (results in smallest number of lags).
+This can be done by using the Information criteria. These are statistics used to decide on an optimal number of variables, including a penalty for the inclusion of many variables (increased number of lags). In R, a function is implemented that returns the calculated selection criteria. Select minimum Bayesian Information Criteria (BIC) from there (this results in the smallest number of lags).
 
 ```{r}
 lagselection<-VARselect(yest)
@@ -318,9 +318,11 @@ plot(impulseFFR3)
 
 IRFs appear to be somewhat comparable to before. However, for the response of the TB3M to the shock, there is much more movement in the first quarters.
 
-### Splitting the time series and only redo the analysis for the constrained sample:
+### Split the time series and only redo the analysis for the constrained sample:
 
-A suitable time point seems to be somewhere around the 1980s. During this time, the time series of the GDP deflator seems to be becoming stationary, which would enable us to avoid taking second differences and solely work with first differences. This assumption will be tested in the following using data from 1985 Q1 onwards:
+We chose 2 different sample split periods: 1985-2020 and 1955-2007. The rationale behind splitting the data at 1985 was that the time series of the GDP deflator seems to be becoming stationary after this point, which would enable us to avoid taking second differences and solely work with first differences. On the other hand, the rationale for splitting the sample at 2007 was to avoid the period of the Global Financial Crisis (GFC) when much unconventional monetary policy was employed, which could make identification of monetary policy responses problematic.
+
+First we split the data at 1985:
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
 gdpdef<-xrawtseries[113:264,2]
@@ -355,9 +357,9 @@ plot(impulseInflation4)
 plot(impulseFFR4)
 
 ```
-Very poor performance of the whole system in terms of explaining the monetary policy shock; no negative impact on inflation, same holds true for the output gap.
+The IRFs for this period appear to respond quite differently from the whole sample: no negative impact on inflation or the output gap.
 
-Another alternative would be to split the time series at a point which would exclude the global financial crisis, as monetary policy makers used unconventional methods to deal with this and subsequent crisis. Therefore, it might be reasonable to simply look at the period before 2007:
+We now condider the period until 2007:
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
 
