@@ -152,9 +152,9 @@ amat
 svar<-SVAR(var, Amat=amat, Bmat=NULL, lrtest = FALSE)
 
 #calculate the impulse response functions
-impulseOutputgap<-vars::irf(svar, response="Outputgap", impulse="FFR", n.ahead=50)
-impulseInflation<-vars::irf(svar, response="Inflation", impulse="FFR", n.ahead=50)
-impulseFFR<-vars::irf(svar, response="FFR", impulse="FFR", n.ahead=50)
+impulseOutputgap<-vars::irf(svar, response="Outputgap", impulse="FFR", n.ahead=24)
+impulseInflation<-vars::irf(svar, response="Inflation", impulse="FFR", n.ahead=24)
+impulseFFR<-vars::irf(svar, response="FFR", impulse="FFR", n.ahead=24)
 
 plot(impulseOutputgap)
 plot(impulseInflation)
@@ -163,7 +163,7 @@ plot(impulseFFR)
 #### What is the unit of measurement on each of the y-axes:
 * FFR: interest rate in percentage points
 * Output gap: GDP growth rate in percent
-* Inflation rate: Change in inflation rate year on year in percent (?)
+* Inflation rate: Change in inflation rate year on year in percent
 
 #### What is the dynamic impulse response of each of the variables to a monetary policy shock?
 The shock is a contractionary monetary policy shock, i.e. the interest rate is increased. This can be seen when looking at the impulse responses for the federal funds rate.
@@ -174,7 +174,7 @@ Increase in interest rate is persistently high for 24 periods and returns to zer
 
 #### Is this in accordance with what we would expect from theory?
 
-The responses are somewhat consistent with economic theory. Consider the basic New Keynesian model. With an contractionary monetary policy shock, interest rates stay persistently high rates over time, tending towards zero. This is consistent with our SVAR model.
+The responses are somewhat consistent with economic theory. Consider the basic New Keynesian model. With an contractionary monetary policy shock, interest rates stay persistently high over time, tending towards zero. This is consistent with our SVAR model.
 
 For GDP growth and the inflation responses, the basic New Keynesian model does not exhibit the initial hump-shaped increase that we observe in the IRFs, but the persistent negative GDP growth and inflation rates, tending back towards zero over time, is consistent with the theoretical model.
 
@@ -186,10 +186,10 @@ For GDP growth and the inflation responses, the basic New Keynesian model does n
 Instead of the output gap, one can look at the Industrial Production and its change over time. Industrial Production is a key figure in economics and should also react to monetary policy shocks, as a decrease in demand and a reduction in investment due to an increase in the interest rate should certainly affect industrial production as well.
 
 #### Alternative to GDP Deflator
-Instead of the GDP Deflator as a measure for inflation, one can look at the CPI. Measures inflation not from the production side, but from the consumption side. While it can be expected that these inflation measures diverge, it seems to be a reasonable assumption that both of the adequatly depict prices. 
+Instead of the GDP Deflator as a measure for inflation, one can look at the CPI. The CPI measures inflation not from the production side, but from the consumption side. While it can be expected that these inflation measures diverge, it seems to be a reasonable assumption that both of them adequatly depict the change in prices. 
 
 #### Alternative to Federal Funds Rate
-Instead of the Federal Funds Rate, one can look at 3-Months Treasury Bill Secondary Markets Rates. A rise in the interest rate should lead to a rise in the Treasury Bill Market rate, as investing becomes more attractive. 
+Instead of the Federal Funds Rate, one can look at the 3-Months Treasury Bill Secondary Markets Rates. A rise in the interest rate should lead to a rise in the Treasury Bill Market rate, as investing becomes more attractive. 
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
 Outputgap_Alt<-fredr(
@@ -221,16 +221,16 @@ A1 <- as.matrix(Bcoef(var1))
 svar1<-SVAR(var1, Amat=amat, Bmat=NULL, lrtest = FALSE)
 
 #Impulse response functions:
-impulseOutputgap1<-vars::irf(svar1, response="Outputgap", impulse="FFR", n.ahead=50)
-impulseInflation1<-vars::irf(svar1, response="Inflation", impulse="FFR", n.ahead=50)
-impulseFFR1<-vars::irf(svar1, response="FFR", impulse="FFR", n.ahead=50)
+impulseOutputgap1<-vars::irf(svar1, response="Outputgap", impulse="FFR", n.ahead=24)
+impulseInflation1<-vars::irf(svar1, response="Inflation", impulse="FFR", n.ahead=24)
+impulseFFR1<-vars::irf(svar1, response="FFR", impulse="FFR", n.ahead=24)
 
 plot(impulseOutputgap1)
 plot(impulseInflation1)
 plot(impulseFFR1)
 ```
 
-Results are very comparable to initial model.
+Results are comparable to initial model.
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
 
@@ -243,11 +243,15 @@ Inflation_Alt<-GDPDEF_Alt<-fredr(
 )
 
 Inflation_Alt_<-ts(Inflation_Alt$value, start=c(1955,1), end=c(2020,4), frequency=4)
-Inflation_Alt_gr<-diff(log(Inflation_Alt_), lag=4)*100
-adf.test(Inflation_Alt_gr, alternative=c("stationary")) #stationary
-Inflation_Alt_gr_<-Inflation_Alt_gr[5:length(Inflation_Alt_gr)]
+Inflation_Alt_gr<-diff(log(Inflation_Alt_), lag=4, diff=1)*100
+adf.test(Inflation_Alt_gr, alternative=c("stationary")) #not stationary (p-value>0.05)
+
+#Take second differences:
+Inflation_Alt_gr2<-diff(log(Inflation_Alt_), lag=4, diff=2)*100
+adf.test(Inflation_Alt_gr2, alternative=c("stationary")) #stationary
+
 yest2<-yest
-yest2[,1]=Inflation_Alt_gr_
+yest2[,2]=Inflation_Alt_gr2
 
 #Selecting optimal lag length
 lagselection2<-VARselect(yest2)
@@ -263,15 +267,15 @@ A2 <- as.matrix(Bcoef(var2))
 svar2<-SVAR(var2, Amat=amat, Bmat=NULL, lrtest = FALSE)
 
 #Impulse response functions:
-impulseOutputgap2<-vars::irf(svar2, response="Outputgap", impulse="FFR", n.ahead=50)
-impulseInflation2<-vars::irf(svar2, response="Inflation", impulse="FFR", n.ahead=50)
-impulseFFR2<-vars::irf(svar2, response="FFR", impulse="FFR", n.ahead=50)
+impulseOutputgap2<-vars::irf(svar2, response="Outputgap", impulse="FFR", n.ahead=24)
+impulseInflation2<-vars::irf(svar2, response="Inflation", impulse="FFR", n.ahead=24)
+impulseFFR2<-vars::irf(svar2, response="FFR", impulse="FFR", n.ahead=24)
 
 plot(impulseOutputgap2)
 plot(impulseInflation2)
 plot(impulseFFR2)
 ```
-Appears to be very comparable to previous results.
+IRFs appear to be somewhat comparable to before. 
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
 FFR_Alt<-fredr(
@@ -287,32 +291,32 @@ FFR_Alt_<-ts(FFR_Alt$value, start=c(1955,1), end=c(2020,4), frequency=4)
 #Create an updated matrix with the exchanged data:
 FFR_Alt__<-FFR_Alt_[9:length(FFR_Alt_)]
 yest3<-yest
-yest3[,1]=FFR_Alt__
+yest3[,3]=FFR_Alt__
 
 #Selecting optimal lag length
 lagselection3<-VARselect(yest3)
 lag3<-lagselection3$selection[3]
 
-#Estimation procedure of the VAR(2)
+#Estimation procedure of the VAR(6)
 var3<-VAR(yest3, p=lag3, type=c("const")) 
 
-#Storing the coefficients of the VAR(2)
+#Storing the coefficients of the VAR(6)
 A3 <- as.matrix(Bcoef(var3))
 
 #Estimating the structural VAR:
 svar3<-SVAR(var3, Amat=amat, Bmat=NULL, lrtest = FALSE)
 
 #Impulse response functions:
-impulseOutputgap3<-vars::irf(svar3, response="Outputgap", impulse="FFR", n.ahead=50)
-impulseInflation3<-vars::irf(svar3, response="Inflation", impulse="FFR", n.ahead=50)
-impulseFFR3<-vars::irf(svar3, response="FFR", impulse="FFR", n.ahead=50)
+impulseOutputgap3<-vars::irf(svar3, response="Outputgap", impulse="FFR", n.ahead=24)
+impulseInflation3<-vars::irf(svar3, response="Inflation", impulse="FFR", n.ahead=24)
+impulseFFR3<-vars::irf(svar3, response="FFR", impulse="FFR", n.ahead=24)
 
 plot(impulseOutputgap3)
 plot(impulseInflation3)
 plot(impulseFFR3)
 ```
 
-Very poor performance in terms of inflation as even in the long run no decrease in the inflation (i.e. contraction of the economy). Also, the impulse response of the 3 Months Treasury Bill looks rather unorthodox, as the shock is not at all persistent.
+IRFs appear to be somewhat comparable to before. However, for the response of the TB3M to the shock, there is much more movement in the first quarters.
 
 ### Splitting the time series and only redo the analysis for the constrained sample:
 
@@ -330,7 +334,7 @@ yest4[,2]<-gdpdefgr_
 
 #Estimation same as before:
 lagselection4<-VARselect(yest4)
-lag4<-lagselection3$selection[3]
+lag4<-lagselection4$selection[3]
 
 #Estimation procedure of the VAR(2)
 var4<-VAR(yest4, p=lag4, type=c("const"))
@@ -342,9 +346,9 @@ A4 <- as.matrix(Bcoef(var4))
 svar4<-SVAR(var4, Amat=amat, Bmat=NULL, lrtest = FALSE)
 
 #Impulse response functions:
-impulseOutputgap4<-vars::irf(svar4, response="Outputgap", impulse="FFR", n.ahead=50)
-impulseInflation4<-vars::irf(svar4, response="Inflation", impulse="FFR", n.ahead=50)
-impulseFFR4<-vars::irf(svar4, response="FFR", impulse="FFR", n.ahead=50)
+impulseOutputgap4<-vars::irf(svar4, response="Outputgap", impulse="FFR", n.ahead=24)
+impulseInflation4<-vars::irf(svar4, response="Inflation", impulse="FFR", n.ahead=24)
+impulseFFR4<-vars::irf(svar4, response="FFR", impulse="FFR", n.ahead=24)
 
 plot(impulseOutputgap4)
 plot(impulseInflation4)
@@ -353,23 +357,53 @@ plot(impulseFFR4)
 ```
 Very poor performance of the whole system in terms of explaining the monetary policy shock; no negative impact on inflation, same holds true for the output gap.
 
+Another alternative would be to split the time series at a point which would exclude the global financial crisis, as monetary policy makers used unconventional methods to deal with this and subsequent crisis. Therefore, it might be reasonable to simply look at the period before 2007:
+
+```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
+
+#Set up a new matrix for the subperiod 1957 Q1 : 2006 Q4
+yest4a<-yest[9:200,]
+
+#Estimation same as before:
+lagselection4a<-VARselect(yest4a)
+lag4a<-lagselection4a$selection[3]
+
+#Estimation procedure of the VAR(2)
+var4a<-VAR(yest4a, p=lag4a, type=c("const")) 
+
+#Storing the coefficients of the VAR(2)
+A4a <- as.matrix(Bcoef(var4a))
+
+#Estimating the structural VAR:
+svar4a<-SVAR(var4a, Amat=amat, Bmat=NULL, lrtest = FALSE)
+
+#Impulse response functions:
+library(vars)
+impulseOutputgap4a<-vars::irf(svar4a, response="Outputgap", impulse="FFR", n.ahead=24)
+impulseInflation4a<-vars::irf(svar4a, response="Inflation", impulse="FFR", n.ahead=24)
+impulseFFR4a<-vars::irf(svar4a, response="FFR", impulse="FFR", n.ahead=24)
+
+plot(impulseOutputgap4a)
+plot(impulseInflation4a)
+plot(impulseFFR4a)
+```
+
+The IRF for the output gap looks very similar to the original IRF; however, the initial positive spike is much smaller than in the original IRF. The other two impulse responses appear to be very similar to before.
+
 ## Bonus Question
 
 ### Bayesian VARs
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
-#For perfect reproducability, is is necessary to set the seed:
+#For perfect reproducability, it is necessary to set the seed:
 set.seed(123456789)
 
-#Setting an appropriate prior
-prior<-bv_priors()
-
-#Estimate the Bayesian VAR
+#Estimate the Bayesian VAR, lag selection from estimation of VAR/SVAR
 x<-BVAR::bvar(yest, lags=lag)
 
 #calculate the impulse response functions
 setting<-bv_irf(horizon=24, identification = FALSE)
-irf(x)<-BVAR::irf(x, setting, conf_bands=c(0.05, 0.1), n_thin=1L)
+irf(x)<-BVAR::irf(x, setting, conf_bands=c(0.05, 0.1))
 plot(BVAR::irf(x))
 ```
 

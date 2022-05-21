@@ -287,15 +287,19 @@ Inflation_Alt<-GDPDEF_Alt<-fredr(
 Inflation_Alt_<-ts(Inflation_Alt$value, start=c(1955,1), end=c(2020,4), frequency=4)
 plot.ts(Inflation_Alt_)
 
-Inflation_Alt_gr<-diff(log(Inflation_Alt_), lag=4)*100
+Inflation_Alt_gr<-diff(log(Inflation_Alt_), lag=4, diff=1)*100
 plot(Inflation_Alt_gr)
 adf.test(Inflation_Alt_gr, alternative=c("stationary"))
-#p-value smaller than 0.10, reject H0 at the 10% level and accept stationarity
+#Not stationary for p-value=0.05. Take second differences
+
+Inflation_Alt_gr2<-diff(log(Inflation_Alt_), lag=4, diff=2)*100
+plot(Inflation_Alt_gr2)
+adf.test(Inflation_Alt_gr2, alternative=c("stationary")) #stationary
+
 #Create an updated matrix with the exchanged data:
 
-Inflation_Alt_gr_<-Inflation_Alt_gr[5:length(Inflation_Alt_gr)]
 yest2<-yest
-yest2[,1]=Inflation_Alt_gr_
+yest2[,2]=Inflation_Alt_gr2
 
 #Selecting optimal lag length
 
@@ -339,23 +343,24 @@ FFR_Alt<-fredr(
 
 FFR_Alt_<-ts(FFR_Alt$value, start=c(1955,1), end=c(2020,4), frequency=4)
 plot(FFR_Alt_)
+lines(xrawtseries[,3], col="green")
 #Create an updated matrix with the exchanged data:
 
 FFR_Alt__<-FFR_Alt_[9:length(FFR_Alt_)]
 yest3<-yest
-yest3[,1]=FFR_Alt__
+yest3[,3]=FFR_Alt__
 
 #Selecting optimal lag length
 
 lagselection3<-VARselect(yest3)
 lag3<-lagselection3$selection[3]
 
-#Estimation procedure of the VAR(2)
+#Estimation procedure of the VAR(6)
 
 var3<-VAR(yest3, p=lag3, type=c("const")) 
 summary(var3)   
 
-#Storing the coefficients of the VAR(2)
+#Storing the coefficients of the VAR(6)
 A3 <- as.matrix(Bcoef(var3))
 
 #Estimating the structural VAR:
@@ -399,12 +404,12 @@ yest4[,2]<-gdpdefgr_
 
 #Estimation same as before:
 lagselection4<-VARselect(yest4)
-lag4<-lagselection3$selection[3]
+lag4<-lagselection4$selection[3]
 
 #Estimation procedure of the VAR(2)
 
 var4<-VAR(yest4, p=lag4, type=c("const")) 
-summary(var3)   
+summary(var4)   
 
 #Storing the coefficients of the VAR(2)
 A4 <- as.matrix(Bcoef(var4))
@@ -426,6 +431,38 @@ plot(impulseFFR4)
 #Very poor performance of the whole system in terms of explaining the monetary
 #policy shock; no negative impact on inflation, same holds true for the outputgap.
 
+#Alternative 2: split just before the monetary policy shock
+
+#Set up a new matrix for the subperiod 1957 Q1 : 2006 Q4
+yest4a<-yest[9:200,]
+
+#Estimation same as before:
+lagselection4a<-VARselect(yest4a)
+lag4a<-lagselection4a$selection[3]
+
+#Estimation procedure of the VAR(2)
+
+var4a<-VAR(yest4a, p=lag4a, type=c("const")) 
+summary(var4a)   
+
+#Storing the coefficients of the VAR(2)
+A4a <- as.matrix(Bcoef(var4a))
+
+#Estimating the structural VAR:
+
+svar4a<-SVAR(var4a, Amat=amat, Bmat=NULL)
+
+#Impulse response functions:
+library(vars)
+impulseOutputgap4a<-vars::irf(svar4a, response="Outputgap", impulse="FFR", n.ahead=50)
+impulseInflation4a<-vars::irf(svar4a, response="Inflation", impulse="FFR", n.ahead=50)
+impulseFFR4a<-vars::irf(svar4a, response="FFR", impulse="FFR", n.ahead=50)
+
+plot(impulseOutputgap4a)
+plot(impulseInflation4a)
+plot(impulseFFR4a)
+
+
 ##########################
 ###Bonus: Bayesian VARs###
 
@@ -434,17 +471,14 @@ library(BVAR)
 #For perfect reproducability, is is necessary to set the seed:
 set.seed(123456789)
 
-#Setting an appropriate prior
-prior<-bv_priors()
-
-#Estimate the Bayesian VAR
+#Estimate the Bayesian VAR, lag selection from estimation of VAR/SVAR
 x<-BVAR::bvar(yest, lags=lag)
 print(x)
 str(x)
 
 #calculate the impulse response functions
 setting<-bv_irf(horizon=24, identification = FALSE)
-irf(x)<-BVAR::irf(x, setting, conf_bands=c(0.05, 0.1), n_thin=1L)
+irf(x)<-BVAR::irf(x, setting, conf_bands=c(0.05, 0.1))
 plot(BVAR::irf(x))
 
 ###Which prior did you use?
