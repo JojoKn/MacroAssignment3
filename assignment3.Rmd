@@ -63,12 +63,18 @@ plot.ts(xrawtseries, main="Macro Time Series")
 rgdpgr<-diff(log(xrawtseries[,1]), lag=4)*100
 plot.ts(rgdpgr)
 abline(h=0, col="green")
+```
 
+The series appears to be stationary.
+
+```{r, fig.height = 3, fig.width = 6, fig.align = "center"}
 #GDP Deflator
 gdpdefgr<-diff(log(xrawtseries[,2]), lag=4)*100
 plot.ts(gdpdefgr)
 abline(h=0, col="green")
 ```
+
+The series does not appear to be stationary (see Question 3).
 
 ## Question 3
 
@@ -78,7 +84,7 @@ abline(h=0, col="green")
 options(width = 60)
 adf.test(rgdpgr, alternative=c("stationary"))
 ```
-Explosiveness can be rejected for this time series, as p-value is smaller than 0.01. Furthermore, from eyeballing the time series, it seems to fluctuate around zero, with an only slightly decreasing variance.
+Explosiveness can be rejected for this time series, as the p-value is smaller than 0.01. Furthermore, from eyeballing the time series, it seems to fluctuate around zero, with an only slightly decreasing variance.
 
 ```{r}
 adf.test(gdpdefgr, alternative=c("stationary"))
@@ -98,7 +104,7 @@ Eyeballing the plot of the time series leads to the conclusion that it is statio
 
 The following are the general form equations for a VAR(p) and a SVAR(p) model, respectively.
 $$
-y_t = c + \sum_{j=1}^{p}A_{ij}y_{t-j} + \epsilon,~~~ \epsilon \sim N(0,\Sigma)
+y_t = c + \sum_{j=1}^{p}A_{ij}y_{t-j} + \epsilon_t,~~~ \epsilon_t \sim N(0,\Sigma)
 $$
 $$
 B_0y_t = B_0c + \sum_{j=1}^{p}B_0A_{ij}y_{t-j} + e_t,~~~ e_t \sim N(0,I)~
@@ -108,7 +114,7 @@ We use VAR to understand the dynamic relation between variables in a system over
 
 For this to work, we need to find the matrix $B_0$, which multiplies the whole VAR to obtain the structural representation. However, this leads to the problem that the model contains more parameters than we can estimate from the model, implying that we need to pose (Mx(M-1))/2 restrictions. The matrix $B_0$ can be obtained using the Cholesky decomposition, which results in a lower triangular matrix that will therefore contain (Mx(M-1))/2 zeros above the main diagonal, which implies that there are sufficient restrictions to estimate the model.
 
-Recursive Identification therefore means that the VAR will first be transformed using B0 to make the error terms uncorrelated with each other before estimating the model. For this to work, we need to pin down $B_0$, which is what we call identification. Recursive refers to the structure of $B_0$ being a lower triangular matrix. The restrictions that are imposed by $B_0$ not only have to include the minimum amount of restrictions for the model to be identified, but also need to have economically meaningful.
+Recursive Identification therefore means that the VAR will first be transformed using B0 to make the error terms uncorrelated with each other before estimating the model. For this to work, we need to pin down $B_0$, which is what we call identification. Recursive refers to the structure of $B_0$ being a lower triangular matrix. The restrictions that are imposed by $B_0$ not only have to include the minimum amount of restrictions for the model to be identified, but also need to be economically meaningful.
 
 The recursive identification process is sensitive to the ordering of variables. In the Cholesky decomposition, the restrictions imply that the first variable is not contemporaneously correlated with any other variables, the second variable is only contemporaneously correlated with the first variable, and so on.
 
@@ -141,7 +147,7 @@ var<-VAR(yest, p=lag, type=c("const"))
 #Storing the coefficients of the VAR(2)
 A <- as.matrix(Bcoef(var))
 ```
-Notational Issues: Looking for the A representation of the SVAR; therefore define a 3x3 identity matrix for the A matrix with NA elements at the spots that one wants to have estimates for; set bmat=NULL in the estimation compared to the notation from task 4, A corresponds to matrix B0.
+Notational Issues: Looking for the A representation of the SVAR; therefore define a 3x3 identity matrix for the A matrix with NA elements at the spots that one wants to have estimates for; set bmat=NULL in the estimation. Compared to the notation from task 4, A corresponds to the matrix B0.
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
 amat<-diag(3)
@@ -162,7 +168,7 @@ plot(impulseFFR)
 ```
 #### What is the unit of measurement on each of the y-axes:
 * FFR: interest rate in percentage points
-* Output gap: GDP growth rate in percent
+* Output gap: GDP growth rate in percentage points
 * Inflation rate: Change in inflation rate year on year in percent
 
 #### What is the dynamic impulse response of each of the variables to a monetary policy shock?
@@ -170,7 +176,7 @@ The shock is a contractionary monetary policy shock, i.e. the interest rate is i
 
 For the inflation, this would imply a decrease; however, this can only be observed in the long run; in the short run, inflation increases due to the monetary policy shock. The same holds true for the output gap (i.e. GDP growth), as this also increases in the short run before decreasing in the long run.
 
-Increase in interest rate is persistently high for 24 periods and returns to zero over time. There is an initial increase in the interest rate after the shock, peaking after 2 periods. Initial increase in GDP growth rate for approximately 5 periods, subsequently becoming negative, then tenting back towards zero over time. Similar to the GDP growth rate, the GDP deflector initially increases, peaking at period 3, then reduces to below zero. This stays persistently below zero for all 24 periods, tending back towards zero over time.
+The increase in the interest rate is persistently high for 24 periods and returns to zero over time. There is an initial increase in the interest rate after the shock, peaking after 2 periods. Initial increase in GDP growth rate for approximately 5 periods, subsequently becoming negative, then tending back towards zero over time. Similar to the GDP growth rate, the GDP deflator change initially increases, peaking at period 3, then reduces to below zero. This stays persistently below zero for all 24 periods, tending back towards zero over time.
 
 #### Is this in accordance with what we would expect from theory?
 
@@ -230,7 +236,7 @@ plot(impulseInflation1)
 plot(impulseFFR1)
 ```
 
-Results are comparable to initial model.
+Results are comparable to the initial model.
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
 
@@ -275,7 +281,7 @@ plot(impulseOutputgap2)
 plot(impulseInflation2)
 plot(impulseFFR2)
 ```
-IRFs appear to be somewhat comparable to before. 
+IRFs appear to be somewhat comparable to before. However, they appear to be less smooth than in the initial model.
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
 FFR_Alt<-fredr(
@@ -357,9 +363,9 @@ plot(impulseInflation4)
 plot(impulseFFR4)
 
 ```
-The IRFs for this period appear to respond quite differently from the whole sample: no negative impact on inflation or the output gap.
+The IRFs for this period appear to respond quite differently from the whole sample: no negative impact on the output gap. Due to not taking second differences, the unit of measurement for inflation has now changed (measured in percentage points). Interestingly, inflation does not become negative and spikes up positively in the first periods. 
 
-We now condider the period until 2007:
+We now consider the period until 2007:
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
 
@@ -415,7 +421,7 @@ The Minnesota prior, with nothing adjusted, everything governed/optimised by the
 #### What are the differences compared to the frequentist VAR?
 In estimation, we use the concept of belief updating; the prior is updated using the dataset to obtain the posterior. Contentwise, the puzzle that was part of the frequentist VAR also appears in the impulse Response functions; even though there is a monetary policy shock which raises the interest rate, Inflation and Outputgap first increase before decreasing.
 
-Frequentist VAR has a small sample bias, where the persistence of parameter estimates is systematically underestimated. Frequentist VAR also faces the curse of dimensionality - the proliferation of parameters when new variables are added. Bayesian VAR approaches address these limitations through regularization and the choice of relevant priors, thus limiting the variance of parameter estimates. The interpretation of uncertainty bands is also different in both approaches - see below.
+Frequentist VAR (e.g. by estimating the VAR using OLS) has a small sample bias, where the persistence of parameter estimates is systematically underestimated. Frequentist VAR also faces the curse of dimensionality - the proliferation of parameters when new variables are added. Moreover, frequentist VAR rely on the conditioning of initial values; here a problem arises if the stochastic process is not observed from the very beginning (due to typically small sample). Bayesian VAR approaches address these limitations through regularization and the choice of relevant priors, thus limiting the variance of parameter estimates. The interpretation of uncertainty bands is also different in both approaches - see below.
 
 #### How do you interpret the uncertainty bands?
 The uncertainty bands result from the estimation uncertainty introduced using the  Bayesian VAR. Between the bands, the credible set of impulse responses can be found. In Bayesian statistics, parameters are not considered to be fixed, but random variables. So, the uncertainty bands can be interpreted as the distribution of the parameter of interest. This reflects the fundamental epistemological uncertainty in the world.

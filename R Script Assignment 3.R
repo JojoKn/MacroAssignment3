@@ -376,10 +376,7 @@ impulseFFR3<-vars::irf(svar3, response="FFR", impulse="FFR", n.ahead=50)
 plot(impulseOutputgap3)
 plot(impulseInflation3)
 plot(impulseFFR3)
-#Very poor performance in terms of inflation as even in the long run no
-#decrease in the inflation (i.e. contraction of the economy)
-#Also, the impulse response of the 3 Months Treasury Bill looks rather 
-#unorthodox, as the shock is not at all persistent.
+
 
 ###Splitting the time series and only redo the analysis for the constrained sample:
 
@@ -490,7 +487,7 @@ plot(BVAR::irf(x))
 #Contentwise, the puzzle that was part of the frequentist VAR also appears in the 
 #Impulse Response functions; even though there is a monetary policy shock which
 #raises the interest rate, Inflation and Outputgap first increase before decreasing.
-# Frequentist VAR has a small sample bias, where the persistence of parameter estimates is systematically underestimated. Frequentist VAR also faces the curse of dimensionality - the proliferation of parameters when new variables are added.
+# Frequentist VAR (e.g. by estimating the VAR using OLS) has a small sample bias, where the persistence of parameter estimates is systematically underestimated. Frequentist VAR also faces the curse of dimensionality - the proliferation of parameters when new variables are added.
 # Bayesian VAR approaches address these limitations through regularization and the choice of relevant priors, thus limiting the variance of parameter estimates.
 # The interpretation of uncertainty bands is also different in both approaches - see below.
 
