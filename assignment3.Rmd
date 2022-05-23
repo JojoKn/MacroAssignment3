@@ -169,7 +169,7 @@ plot(impulseFFR)
 #### What is the unit of measurement on each of the y-axes:
 * FFR: interest rate in percentage points
 * Output gap: GDP growth rate in percentage points
-* Inflation rate: Change in inflation rate year on year in percent
+* Inflation rate: Change in inflation rate year on year in percentage points
 
 #### What is the dynamic impulse response of each of the variables to a monetary policy shock?
 The shock is a contractionary monetary policy shock, i.e. the interest rate is increased. This can be seen when looking at the impulse responses for the federal funds rate.
@@ -281,7 +281,7 @@ plot(impulseOutputgap2)
 plot(impulseInflation2)
 plot(impulseFFR2)
 ```
-IRFs appear to be somewhat comparable to before. However, they appear to be less smooth than in the initial model.
+IRFs appear to be somewhat comparable to before. However, they appear to be less smooth than in the initial specification.
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
 FFR_Alt<-fredr(
@@ -363,7 +363,7 @@ plot(impulseInflation4)
 plot(impulseFFR4)
 
 ```
-The IRFs for this period appear to respond quite differently from the whole sample: no negative impact on the output gap. Due to not taking second differences, the unit of measurement for inflation has now changed (measured in percentage points). Interestingly, inflation does not become negative and spikes up positively in the first periods. 
+The IRFs for this period appear to respond quite differently from the whole sample: no negative impact on the output gap. Due to not taking second differences, the unit of measurement for inflation has now changed (measured in percentage points). Interestingly, inflation does not become negative and spikes up positively in the first periods, which is not what we would expect when drawing on economic theory.
 
 We now consider the period until 2007:
 
