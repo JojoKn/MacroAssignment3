@@ -326,9 +326,9 @@ IRFs appear to be somewhat comparable to before. However, for the response of th
 
 ### Split the time series and only redo the analysis for the constrained sample:
 
-We chose 2 different sample split periods: 1985-2020 and 1955-2007. The rationale behind splitting the data at 1985 was that the time series of the GDP deflator seems to be becoming stationary after this point, which would enable us to avoid taking second differences and solely work with first differences. On the other hand, the rationale for splitting the sample at 2007 was to avoid the period of the Global Financial Crisis (GFC) when much unconventional monetary policy was employed, which could make identification of monetary policy responses problematic.
+We chose 2 different sample split periods: 1984-2020 and 1955-2007. The rationale behind splitting the data at 1984 was that the time series of the GDP deflator seems to be becoming stationary after this point, which would enable us to avoid taking second differences and solely work with first differences. On the other hand, the rationale for splitting the sample at 2007 was to avoid the period of the Global Financial Crisis (GFC) when much unconventional monetary policy was employed, which could make identification of monetary policy responses problematic.
 
-First we split the data at 1985:
+First we split the data at 1984:
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
 gdpdef<-xrawtseries[113:264,2]
@@ -336,7 +336,7 @@ gdpdefgr_<-diff(log(gdpdef), lag=4)*100
 plot.ts(gdpdefgr_)
 adf.test(gdpdefgr_, alternative=c("stationary")) #stationary 
 
-#Set up a new matrix for this subperiod: 1985 Q1 : 2020 Q4
+#Set up a new matrix for this subperiod: 1984 Q1 : 2020 Q4
 yest4<-yest[109:256,]
 yest4[,2]<-gdpdefgr_
 
@@ -363,14 +363,14 @@ plot(impulseInflation4)
 plot(impulseFFR4)
 
 ```
-The IRFs for this period appear to respond quite differently from the whole sample: no negative impact on the output gap. Due to not taking second differences, the unit of measurement for inflation has now changed (measured in percentage points). Interestingly, inflation does not become negative and spikes up positively in the first periods, which is not what we would expect when drawing on economic theory.
+The IRFs for this period appear to respond quite differently from the whole sample: no negative impact on the output gap. Interestingly, inflation does not become negative and spikes up positively in the first periods, which is not what we would expect when drawing on economic theory.
 
 We now consider the period until 2007:
 
 ```{r, fig.height = 4, fig.width = 6, fig.align = "center"}
 
 #Set up a new matrix for the subperiod 1957 Q1 : 2006 Q4
-yest4a<-yest[9:200,]
+yest4a<-yest[1:200,]
 
 #Estimation same as before:
 lagselection4a<-VARselect(yest4a)
@@ -396,7 +396,7 @@ plot(impulseInflation4a)
 plot(impulseFFR4a)
 ```
 
-The IRF for the output gap looks very similar to the original IRF; however, the initial positive spike is much smaller than in the original IRF. The other two impulse responses appear to be very similar to before.
+The IRF for the output gap looks very similar to the original IRF; however, the initial positive spike is much smaller than in the original IRF. The other two impulse responses appear to be rather similar to before.
 
 ## Bonus Question
 
