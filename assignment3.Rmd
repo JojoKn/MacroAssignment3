@@ -428,4 +428,4 @@ The uncertainty bands result from the estimation uncertainty introduced using th
 
 In Bayesian statistics, parameters are not considered to be fixed, but random variables. So, the uncertainty bands can be interpreted as the distribution of the parameter of interest. This reflects the fundamental epistemological uncertainty in the world.
 
-In frequentist statistics, we think of the parameter as a fixed and unknown value, and the uncertainty band is a set of values within which the 'true' value should lie with a given certainty.
+In frequentist statistics, we think of the confidence interval as an estimated range of values which is likely to include an unknown population parameter, the estimated range being calculated from a given set of sample data. This means, we can show the interval in which the true impulse response function lies with a given level of confidence.
